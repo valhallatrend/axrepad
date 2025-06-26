@@ -13,7 +13,8 @@ if (isset($_GET['eliminar'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cuenta_original'])) {
     $stmt = $db->prepare('UPDATE licencias SET cuenta=:cuenta, tipo=:tipo, expira=:expira, max_posiciones=:max_posiciones,
-                         email=:email, comentario=:comentario, estado=:estado WHERE cuenta=:cuenta_original');
+                         email=:email, comentario=:comentario, estado=:estado, version_permitida=:version_permitida
+                         WHERE cuenta=:cuenta_original');
     $stmt->execute([
         ':cuenta_original' => $_POST['cuenta_original'],
         ':cuenta' => $_POST['cuenta'],
@@ -22,7 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cuenta_original'])) {
         ':max_posiciones' => $_POST['max_posiciones'],
         ':email' => $_POST['email'],
         ':comentario' => $_POST['comentario'],
-        ':estado' => $_POST['estado']
+        ':estado' => $_POST['estado'],
+        ':version_permitida' => $_POST['version_permitida']
     ]);
     echo "<p style='color:green;'>Licencia actualizada.</p>";
 }
@@ -33,15 +35,16 @@ $licencias = $db->query('SELECT * FROM licencias ORDER BY cuenta')->fetchAll(PDO
 <h2>Panel de Licencias</h2>
 <table border="1" cellpadding="5">
 <tr>
-<th>Cuenta</th><th>Tipo</th><th>Expira</th><th>Máx Pos.</th><th>Email</th><th>Comentario</th><th>Estado</th><th>Acción</th>
+<th>Cuenta</th><th>Tipo</th><th>Expira</th><th>Máx Pos.</th><th>Email</th><th>Comentario</th><th>Estado</th><th>Versión</th><th>Acción</th>
 </tr>
 <?php foreach ($licencias as $lic) { ?>
 <tr><form method="POST">
 <td><input name="cuenta" value="<?=$lic['cuenta']?>"></td>
 <td>
     <select name="tipo">
-        <option value="real" <?=$lic['tipo']=='real'?'selected':''?>>real</option>
-        <option value="demo" <?=$lic['tipo']=='demo'?'selected':''?>>demo</option>
+        <option value="DEMO" <?=$lic['tipo']=='DEMO'?'selected':''?>>DEMO</option>
+        <option value="BASICO" <?=$lic['tipo']=='BASICO'?'selected':''?>>BASICO</option>
+        <option value="VIP" <?=$lic['tipo']=='VIP'?'selected':''?>>VIP</option>
     </select>
 </td>
 <td><input type="date" name="expira" value="<?=$lic['expira']?>"></td>
@@ -54,6 +57,7 @@ $licencias = $db->query('SELECT * FROM licencias ORDER BY cuenta')->fetchAll(PDO
         <option value="inactivo" <?=$lic['estado']=='inactivo'?'selected':''?>>inactivo</option>
     </select>
 </td>
+<td><input name="version_permitida" value="<?=$lic['version_permitida'] ?? ''?>"></td>
 <td>
     <input type="hidden" name="cuenta_original" value="<?=$lic['cuenta']?>">
     <button type="submit">Guardar</button>
