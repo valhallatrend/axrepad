@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: licencias-api
+    name: axrepad
     env: docker
     plan: free
     dockerfilePath: ./Dockerfile
